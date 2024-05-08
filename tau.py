@@ -35,7 +35,7 @@ class MixMlp(nn.Module):
 
     def forward(self, x):
         x = x.flatten(2).transpose(0, 2)
-        print(x.shape)
+        # print(x.shape)
         x = self.fc1(x)
         x = self.dwconv(x)
         x = self.act(x)
