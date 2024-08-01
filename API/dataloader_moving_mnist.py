@@ -156,8 +156,8 @@ def load_data(
 
 
     # Get 1/100th of the dataset indices
-    subset_indices_train = list(range(len(train_set))[::10])
-    subset_indices_test = list(range(len(test_set))[::10])
+    subset_indices_train = list(range(len(train_set))[::1000])
+    subset_indices_test = list(range(len(test_set))[::1000])
 
     # Create subsets of the original datasets
     subset_train_set = Subset(train_set, subset_indices_train)

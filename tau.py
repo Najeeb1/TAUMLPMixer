@@ -34,7 +34,7 @@ class MixMlp(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
-        x = x.flatten(2).transpose(0, 2)
+        # x = x.flatten(2).transpose(0, 2)
         # print(x.shape)
         x = self.fc1(x)
         x = self.dwconv(x)

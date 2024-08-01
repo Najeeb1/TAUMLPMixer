@@ -1,7 +1,8 @@
 import torch
 from torch import nn
 from modules import ConvSC, Inception
-from tau import MixMlp
+from patchtst.PatchTST import Patch_TST
+# from tau import MixMlp
 
 def stride_generator(N, reverse=False):
     strides = [1, 2]*10
@@ -43,30 +44,28 @@ class Decoder(nn.Module):
         return Y
 
 
-
-
 class SimVP(nn.Module):
     def __init__(self, shape_in, hid_S=64, hid_T=256, N_S=4, N_T=8, incep_ker=[3,5,7,11], groups=8):
         super(SimVP, self).__init__()
         T, C, H, W = shape_in
         self.enc = Encoder(C, hid_S, N_S)
-        # self.hid = Mid_Xnet(T*hid_S, hid_T, N_T, incep_ker, groups)
-        self.hid = MixMlp(T*hid_S)
+        self.patchtst = Patch_TST(T*hid_S)
         self.dec = Decoder(hid_S, C, N_S)
 
-
     def forward(self, x_raw):
+        
         B, T, C, H, W = x_raw.shape
         x = x_raw.view(B*T, C, H, W)
 
         embed, skip = self.enc(x)
         _, C_, H_, W_ = embed.shape
-
-        z = embed.view(B, H_*W_, C_, T)
+       
+        z = embed.view(B*H_*W_, C_, T)
+       
+        patchtst_out = self.patchtst(z)
+    
+        patchtst_out = patchtst_out.reshape(B*T, C_, H_, W_) #
         
-        hid = self.hid(z)
-        hid = hid.reshape(B*T, C_, H_, W_)
-
-        Y = self.dec(hid, skip)
+        Y = self.dec(patchtst_out, skip)
         Y = Y.reshape(B, T, C, H, W)
         return Y
